@@ -50,22 +50,31 @@ const Landing = () => {
     return "stable";
   };
 
+  const confidencePct =
+    latestPrediction?.confidence !== undefined && latestPrediction?.confidence !== null
+      ? `${Number(latestPrediction.confidence).toFixed(1)}%`
+      : "—";
+  const currentAqi =
+    latestPrediction?.aqi !== undefined && latestPrediction?.aqi !== null
+      ? Number(latestPrediction.aqi).toFixed(0)
+      : "—";
+
   return (
-    <div className="bg-[#F6F8FC] text-[#0F172A] min-h-screen font-sans">
+    <div className="bg-slate-50 text-slate-900 min-h-screen font-sans">
 
       {/* ================= NAVBAR ================= */}
-      <div className="w-full border-b border-[#E2E8F0] bg-white px-[80px] py-[18px] flex justify-between items-center">
+      <div className="w-full border-b border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/80 px-5 md:px-10 xl:px-20 py-4 flex justify-between items-center">
 
         {/* Logo */}
         <div className="flex items-center gap-3">
-          <div className="w-7 h-7 bg-blue-600 rounded-md"></div>
-          <span className="text-[18px] font-semibold text-blue-500">
+          <div className="w-7 h-7 bg-blue-600 rounded-md shadow-sm"></div>
+          <span className="text-[18px] font-semibold text-blue-600">
             Pollution Regime
           </span>
         </div>
 
         {/* Center Links */}
-        <div className="flex gap-10 text-[14px] text-slate-500">
+        <div className="hidden lg:flex gap-10 text-[14px] text-slate-500">
           <span className="hover:text-slate-900 cursor-pointer">Docs</span>
           <span className="hover:text-slate-900 cursor-pointer">Methodology</span>
           <span className="hover:text-slate-900 cursor-pointer">Contact</span>
@@ -73,10 +82,10 @@ const Landing = () => {
 
         {/* Right */}
         <div className="flex items-center gap-6">
-          <span className="text-slate-500 text-[14px]">API Reference</span>
+          <span className="hidden md:inline text-slate-500 text-[14px]">API Reference</span>
           <Link
             to="/dashboard"
-            className="bg-white border border-slate-200 shadow-sm px-5 py-2 rounded-md text-sm text-slate-900 hover:shadow-md"
+            className="bg-white border border-slate-200 shadow-sm px-5 py-2 rounded-md text-sm text-slate-900 hover:shadow-md transition"
           >
             Get Started
           </Link>
@@ -84,18 +93,18 @@ const Landing = () => {
       </div>
 
       {/* ================= HERO ================= */}
-      <div className="px-[80px] pt-[80px] pb-[120px] flex justify-between items-center">
+      <div className="px-5 md:px-10 xl:px-20 pt-12 md:pt-20 pb-16 md:pb-24 flex flex-col lg:flex-row gap-10 lg:gap-16 justify-between items-start lg:items-center">
 
         {/* LEFT */}
-        <div className="max-w-[650px]">
+        <div className="max-w-2xl">
 
           <div className="inline-block border border-blue-200 bg-white text-blue-600 text-xs px-4 py-1 rounded-full mb-6">
             ⚡ Powered by HMM Technology
           </div>
 
-          <h1 className="text-[72px] leading-[78px] font-bold mb-6">
-            Pollution <br />
-            Regime <br />
+          <h1 className="text-4xl md:text-6xl xl:text-7xl leading-tight font-bold mb-6 tracking-tight">
+            Pollution Regime
+            <br />
             Detection using{" "}
             <span className="text-blue-500">AI</span>
           </h1>
@@ -106,29 +115,48 @@ const Landing = () => {
             into actionable environmental insights.
           </p>
 
-          <div className="flex gap-4 mb-6">
+          <div className="flex flex-wrap gap-4 mb-8">
             <Link
               to="/upload"
-              className="bg-white border border-slate-200 shadow-sm px-6 py-3 rounded-lg text-sm text-slate-900 hover:shadow-md"
+              className="bg-blue-600 text-white border border-blue-600 shadow-sm px-6 py-3 rounded-lg text-sm hover:bg-blue-700 transition"
             >
-              Get Started
+              Upload Dataset
             </Link>
 
             <Link
               to="/dashboard"
-              className="border border-slate-200 bg-white px-6 py-3 rounded-lg text-sm hover:border-blue-300"
+              className="border border-slate-200 bg-white px-6 py-3 rounded-lg text-sm hover:border-blue-300 transition"
             >
               View Dashboard
             </Link>
+            <Link
+              to="/history"
+              className="border border-slate-200 bg-white px-6 py-3 rounded-lg text-sm hover:border-blue-300 transition"
+            >
+              View History
+            </Link>
           </div>
 
-          <p className="text-slate-500 text-sm">
-            ⚠ No sensors or external APIs required — upload your CSV to begin.
-          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="bg-white border border-slate-200 rounded-lg px-4 py-3">
+              <p className="text-xs text-slate-500">Current AQI</p>
+              <p className="text-xl font-bold text-slate-900">{currentAqi}</p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-lg px-4 py-3">
+              <p className="text-xs text-slate-500">Latest Regime</p>
+              <p className="text-xl font-bold text-slate-900 capitalize">
+                {normalizeRegime(latestPrediction?.regime || latestPrediction?.state)}
+              </p>
+            </div>
+            <div className="bg-white border border-slate-200 rounded-lg px-4 py-3">
+              <p className="text-xs text-slate-500">Confidence</p>
+              <p className="text-xl font-bold text-slate-900">{confidencePct}</p>
+            </div>
+          </div>
         </div>
 
         {/* RIGHT CARD */}
-        <div className="bg-white border border-[#E2E8F0] rounded-xl p-6 w-[420px] shadow-xl">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 w-full max-w-lg shadow-xl">
 
           <div className="flex justify-between items-center mb-4">
             <div>
@@ -146,7 +174,7 @@ const Landing = () => {
             </div>
           </div>
 
-          <div className="h-[200px] bg-[#F8FAFC] rounded-lg flex flex-col items-center justify-center text-slate-700 text-sm p-6 text-center">
+          <div className="h-[220px] bg-slate-50 rounded-xl flex flex-col items-center justify-center text-slate-700 text-sm p-6 text-center">
             {modelInfo ? (
               <>
                 <div className="text-[11px] font-bold uppercase text-slate-500 mb-2">Latest Trained Model</div>
@@ -177,15 +205,15 @@ const Landing = () => {
 
           <div className="flex justify-between text-xs text-slate-500 mt-4">
             <span>{modelInfo ? `Log Likelihood: ${Number(modelInfo.log_likelihood).toFixed(2)}` : "Log Likelihood: —"}</span>
-            <span>Confidence: —</span>
+            <span>Confidence: {confidencePct}</span>
           </div>
         </div>
       </div>
 
       {/* ================= FEATURES ================= */}
-      <div className="bg-white px-[80px] py-[80px] border-y border-slate-200">
+      <div className="bg-white px-5 md:px-10 xl:px-20 py-16 md:py-20 border-y border-slate-200">
 
-        <div className="grid grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
 
           {/* CARD 1 */}
           <div>
@@ -198,9 +226,9 @@ const Landing = () => {
               PM10, NO2, and SO2 time-series without needing active sensor
               connections.
             </p>
-            <span className="text-blue-400 text-sm cursor-pointer">
+            <Link to="/upload" className="text-blue-500 text-sm cursor-pointer font-medium hover:text-blue-700 transition">
               Upload CSV →
-            </span>
+            </Link>
           </div>
 
           {/* CARD 2 */}
@@ -213,9 +241,9 @@ const Landing = () => {
               Configure your Hidden Markov Model with custom states. Our engine
               automatically optimizes transition probabilities for your dataset.
             </p>
-            <span className="text-blue-400 text-sm cursor-pointer">
+            <Link to="/settings" className="text-blue-500 text-sm cursor-pointer font-medium hover:text-blue-700 transition">
               Configure & Train →
-            </span>
+            </Link>
           </div>
 
           {/* CARD 3 */}
@@ -230,15 +258,15 @@ const Landing = () => {
               Instantly view regime transitions. Identify persistent 'Stable'
               periods and risky 'Volatile' bursts with high-confidence mapping.
             </p>
-            <span className="text-blue-400 text-sm cursor-pointer">
+            <Link to="/advanced" className="text-blue-500 text-sm cursor-pointer font-medium hover:text-blue-700 transition">
               Explore Visuals →
-            </span>
+            </Link>
           </div>
         </div>
       </div>
 
       {/* ================= TAG BAR ================= */}
-      <div className="border-t border-[#E2E8F0] border-b border-[#E2E8F0] py-6 px-[80px] flex justify-between text-slate-500 text-sm">
+      <div className="border-t border-slate-200 border-b border-slate-200 py-6 px-5 md:px-10 xl:px-20 flex flex-wrap gap-3 md:gap-0 justify-between text-slate-500 text-sm">
         <span>📁 CSV_INPUT</span>
         <span>🧠 HMM_INFERENCE</span>
         <span>⬇ EXPORTABLE_REPORTS</span>
@@ -246,9 +274,9 @@ const Landing = () => {
       </div>
 
       {/* ================= FOOTER ================= */}
-      <div className="px-[80px] py-[60px]">
+      <div className="px-5 md:px-10 xl:px-20 py-14">
 
-        <div className="flex justify-between items-start mb-10">
+        <div className="flex flex-col lg:flex-row gap-8 justify-between items-start mb-10">
 
           <div>
             <h2 className="text-blue-500 font-semibold mb-2">
@@ -259,7 +287,7 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="flex gap-8 text-slate-500 text-sm">
+          <div className="flex flex-wrap gap-6 text-slate-500 text-sm">
             <span>About</span>
             <span>Privacy Policy</span>
             <span>Terms of Service</span>

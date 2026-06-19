@@ -15,7 +15,8 @@ from backend.services.run_lookup import get_latest_successful_run_with_predictio
 from backend.services.settings_service import load_inference_settings
 from backend.services.run_metrics import update_run_metrics
 
-ARTIFACTS_DIR = Path("artifacts")
+from backend.config import ARTIFACTS_DIR
+
 
 
 def train_model_service(n_states: int, dataset_id: str = None):
@@ -87,7 +88,7 @@ def load_and_clean_csv(csv_path: Path) -> pd.DataFrame:
     df = df.replace(-200, np.nan)
 
     for col in DEFAULT_FEATURES:
-        df[col] = df[col].astype(str).str.replace(",", ".", regex=False)
+        df[col] = df[col].astype(str).str.replace(",", ".", regex=False) 
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
     df = df[df["CO(GT)"] >= 0]

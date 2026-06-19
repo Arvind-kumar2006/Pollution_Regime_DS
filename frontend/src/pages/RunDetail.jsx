@@ -70,20 +70,20 @@ export default function RunDetail() {
             </h1>
          </div>
 
-         <div className="flex flex-wrap gap-4 justify-end">
-            <div className="text-right">
+         <div className="flex flex-wrap gap-8 justify-end">
+            <div className="text-right pl-8 border-l border-slate-200">
                <span className="block text-[11px] font-black tracking-widest text-slate-400 uppercase mb-1">Target Base</span>
                <span className="text-[14px] font-bold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">{meta.dataset_name}</span>
             </div>
-            <div className="text-right">
+            <div className="text-right pl-8 border-l border-slate-200">
                <span className="block text-[11px] font-black tracking-widest text-slate-400 uppercase mb-1">Total Prediction Rows</span>
                <span className="text-[14px] font-bold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">{meta.total_rows} Rows</span>
             </div>
-            <div className="text-right">
+            <div className="text-right pl-8 border-l border-slate-200">
                <span className="block text-[11px] font-black tracking-widest text-slate-400 uppercase mb-1">Run Peak AQI</span>
                <span className="text-[14px] font-bold text-slate-800 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">{meta.peak_aqi} AQI</span>
             </div>
-            <div className="text-right">
+            <div className="text-right pl-8 border-l border-slate-200">
                <span className="block text-[11px] font-black tracking-widest text-slate-400 uppercase mb-1">Stable / Volatile / High</span>
                <span className="text-[14px] font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
                    {meta.stable_pct}% / {meta.volatile_pct}% / {meta.high_pct}%

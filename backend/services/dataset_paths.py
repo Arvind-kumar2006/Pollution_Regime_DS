@@ -2,8 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-
-DATA_DIR = Path("data")
+from backend.config import DATA_DIR
 
 
 def resolve_dataset_csv_path(dataset) -> Path | None:
@@ -15,6 +14,12 @@ def resolve_dataset_csv_path(dataset) -> Path | None:
         p = Path(fp)
         if p.is_absolute():
             return p if p.exists() else None
+        
+        # Check relative to DATA_DIR first
+        cand = DATA_DIR / p.name
+        if cand.exists():
+            return cand
+
         cand = Path.cwd() / p
         return cand if cand.exists() else None
     stored = getattr(dataset, "stored_file_name", None)
@@ -22,3 +27,4 @@ def resolve_dataset_csv_path(dataset) -> Path | None:
         cand = DATA_DIR / stored
         return cand if cand.exists() else None
     return None
+

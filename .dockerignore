@@ -1,0 +1,21 @@
+.git
+.gitignore
+
+# Python caches / virtualenvs
+**/__pycache__
+**/*.pyc
+backend/.venv
+.venv
+
+# Frontend build artifacts
+frontend/node_modules
+frontend/dist
+
+# Local runtime data (ephemeral)
+artifacts
+backend/artifacts
+data/*.csv
+
+# OS/editor files
+.DS_Store
+.cursor

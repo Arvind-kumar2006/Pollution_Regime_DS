@@ -125,10 +125,6 @@ def get_settings():
     finally:
         db.close()
 
-@router.get("")
-def get_settings_no_slash():
-    return get_settings()
-
 
 def _apply_put(db, payload: dict) -> dict:
     if not payload:
@@ -184,20 +180,6 @@ def _put_settings_handler(payload: dict):
 
 @router.put("/")
 def put_settings(payload: dict = Body(...), _auth: None = Depends(require_settings_write_key)):
-    return _put_settings_handler(payload)
-
-@router.put("")
-def put_settings_no_slash(payload: dict = Body(...), _auth: None = Depends(require_settings_write_key)):
-    return _put_settings_handler(payload)
-
-
-@router.post("/")
-def post_settings_alias(payload: dict = Body(default_factory=dict), _auth: None = Depends(require_settings_write_key)):
-    """Backward compatibility: POST /settings/ delegates to PUT."""
-    return _put_settings_handler(payload)
-
-@router.post("")
-def post_settings_alias_no_slash(payload: dict = Body(default_factory=dict), _auth: None = Depends(require_settings_write_key)):
     return _put_settings_handler(payload)
 
 

@@ -35,16 +35,16 @@ def train(n_states: Optional[int] = None, dataset_id: Optional[str] = None):
     effective_n = (
         int(n_states)
         if n_states is not None
-        else int(load_inference_settings()["n_states"])
+        else int(load_inference_settings()["n_states"]) 
     )
-    t0 = time.perf_counter()
-    db = SessionLocal()
+    t0 = time.perf_counter() # mesure the training duration 
+    db = SessionLocal() # used to talk with postgresql 
     try:
         # Backward-compatible behavior: if dataset_id is omitted, consistently use
         # the latest uploaded dataset (never silently fall back to pollution.csv).
         effective_dataset_id: Optional[str] = dataset_id
         target_dataset = None
-        if effective_dataset_id:
+        if effective_dataset_id: # use latest uploaded dataset
             target_dataset = (
                 db.query(Dataset).filter(Dataset.dataset_id == effective_dataset_id).first()
             )
@@ -96,7 +96,7 @@ def train(n_states: Optional[int] = None, dataset_id: Optional[str] = None):
             dataset_id=effective_dataset_id,
             persist_run_id=str(new_run.run_id),
         )
-        duration = time.perf_counter() - t0
+        duration = time.perf_counter() - t0 #
 
         if predictions.get("error"):
             nr = db.query(ModelRun).filter(ModelRun.run_id == new_run.run_id).first()

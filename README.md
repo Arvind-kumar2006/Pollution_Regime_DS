@@ -1,194 +1,245 @@
-# Pollution Regime Classification (HMM) — FastAPI + React
+# Pollution Regime Classification (HMM)
 
-Production-oriented, full-stack analytics app that classifies **hidden pollution regimes** (stable / volatile / high) from air-quality time-series data using a **Hidden Markov Model (HMM)**. Includes dataset upload, model training, persisted inference, dashboarding, advanced analytics, history, and validated system settings.
+Production-ready full-stack analytics application that classifies **hidden pollution regimes** (stable, volatile, high) from air-quality time series using **Hidden Markov Models (HMM)**.
+
+## Project overview
+This project provides an end-to-end pipeline for:
+- uploading pollution datasets,
+- training an HMM-based regime model,
+- persisting predictions and run metadata,
+- visualizing current and historical behavior in a React dashboard.
+
+It is built to be operationally practical with configuration validation, readiness checks, and consistent run selection across analytics endpoints.
 
 ## Problem statement
-Air-quality sensor streams are noisy and non-stationary. Pure threshold rules miss temporal context and regime transitions. This project uses an HMM to learn latent states and provides an operational UI to interpret regime shifts with confidence and auditability.
+Air-quality streams are noisy and change over time. Static thresholding alone misses temporal behavior and transitions.  
+This system combines sequence modeling (HMM) with domain thresholds and UI analytics so users can detect regime shifts, confidence trends, and run-to-run differences reliably.
 
 ## Features
-- Dataset upload (CSV) with preview + metadata stored in Postgres
-- Model training + artifact persistence
-- Regime inference with confidence scores
-- Dashboard: current AQI/regime/confidence, timeseries chart, transitions log
-- Advanced analytics: transition matrix, hourly aggregation, confidence trend windows
-- History + run detail inspection
-- System settings API with validation and reset support
+- CSV dataset upload with preview and metadata persistence
+- HMM model training with configurable hidden states
+- Regime inference with confidence scoring
+- Dashboard with current AQI/regime/confidence, trend chart, and transitions
+- Advanced analytics (transition matrix, hourly aggregates, confidence trend)
+- Run history and run detail views for auditability
+- Validated settings API with reset support and metadata (`last_updated_at`, `config_version`)
+- Canonical latest successful run logic for consistent dashboard data sources
+- Health + readiness endpoints for deployment checks
 
-## Architecture (high level)
-- **Frontend**: React + Tailwind + Recharts
-- **Backend**: FastAPI + SQLAlchemy
-- **DB**: PostgreSQL (`datasets`, `model_runs`, `regime_predictions`, `system_settings`)
-- **ML**: pandas/numpy preprocessing, scikit-learn scaler, hmmlearn HMM
+## Architecture
+- **Frontend**: React, Tailwind CSS, Recharts
+- **Backend**: FastAPI, SQLAlchemy
+- **Database**: PostgreSQL
+- **ML/Data**: hmmlearn, scikit-learn, pandas, numpy
+
+### High-level flow
+1. Upload dataset (`/data/upload`) -> store file metadata in `datasets`.
+2. Train model (`/model/train`) -> create `model_runs` row and artifacts.
+3. Predict regimes -> persist `regime_predictions`.
+4. Dashboard and analytics endpoints read canonical latest successful run.
 
 ## Screenshots
-Add screenshots in `docs/screenshots/` and link them here.
+Image-heavy sections were removed as requested.  
+Add project screenshots under `docs/screenshots/`:
+- `dashboard.png`
+- `upload.png`
+- `history.png`
+- `advanced.png`
+- `settings.png`
 
-## API endpoints (selected)
+## API endpoints
+
+### Data
 - `POST /data/upload`
+  - Upload CSV dataset
+  - Returns: `dataset_id`, `columns`, `preview`, `metrics_status`
+
+### Model
 - `POST /model/train?n_states=&dataset_id=`
+  - Train on dataset and create a new run
+  - Persists predictions linked to the same `run_id` + `dataset_id`
 - `GET /model/dashboard/latest`
+  - Unified payload for dashboard widgets
 - `GET /model/history`
+  - List runs and aggregate metrics
 - `GET /model/history/{run_id}`
+  - Run-specific details and paginated predictions
 - `GET /model/advanced-analytics?days=`
+  - Transition matrix + confidence/hourly analytics
 - `GET /model/info`
+  - Canonical latest successful run metadata
+
+### Settings
 - `GET /settings/`
-- `PUT /settings/` (write-protected in production)
-- `POST /settings/reset` (write-protected in production)
-- `GET /health`, `GET /health/ready`
+  - Returns `{ settings, meta }`
+- `PUT /settings/`
+  - Write settings (write-protected in production)
+- `POST /settings/reset`
+  - Reset to defaults (write-protected in production)
 
-## Setup
-See:
-- `backend/.env.example`
-- `frontend/.env.example`
-- `docs/setup-local.md`
-- `docs/deploy-ec2.md`
+### Health
+- `GET /health` (liveness)
+- `GET /health/ready` (DB readiness check)
 
-## Resume-ready highlights
-- Full-stack ML analytics app (FastAPI + React) for pollution regime classification using HMMs
-- Persisted runs and predictions with Postgres-backed auditability
-- Canonical latest successful run selection to keep dashboard widgets consistent
-- Production hardening: validated settings, readiness checks, env-based configuration
+## Local setup
 
-## GitHub topics
-`fastapi`, `react`, `tailwindcss`, `recharts`, `postgresql`, `sqlalchemy`, `pandas`, `numpy`, `hmmlearn`, `hidden-markov-model`, `time-series`, `data-visualization`
+### Prerequisites
+- Node.js 18+
+- Python 3.11+
+- PostgreSQL 14+
 
-## How HMM is used here
-- Clean and standardize time-series features
-- Train an HMM with configurable hidden states (`n_states`)
-- Map inferred behavior to logical regimes (stable/volatile/high)
-- Persist predictions and compute per-run metrics for consistent dashboards
+### Backend
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+export DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/pollution_db"
+export APP_ENV=development
+export CORS_ORIGINS="http://localhost:5173,http://127.0.0.1:5173"
+
+alembic upgrade head
+uvicorn backend.main:app --reload
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+echo 'VITE_API_URL=http://127.0.0.1:8000' > .env.local
+npm run dev
+```
+
+Open: `http://localhost:5173`
+
+### Health checks
+- `GET http://127.0.0.1:8000/health`
+- `GET http://127.0.0.1:8000/health/ready`
+
+## Production deployment (AWS EC2)
+Recommended split:
+- React static frontend (Nginx or static host)
+- FastAPI backend behind reverse proxy
+- PostgreSQL (RDS preferred)
+
+### Deployment roots (important)
+- **Backend deploy root (preferred)**: use `backend/Dockerfile` for backend-only builds
+- **Backend fallback**: repository root `Dockerfile` (kept working)
+- **Frontend deploy root**: `frontend/` (for Vercel/Netlify)
+
+Backend image build commands:
+```bash
+# Preferred
+docker build -f backend/Dockerfile -t pollution-regime-api:latest .
+
+# Fallback
+docker build -f Dockerfile -t pollution-regime-api:latest .
+```
+
+For Vercel/Netlify:
+- set **Root Directory** to `frontend`
+- set build command to `npm run build`
+- set output directory to `dist`
+- set env `VITE_API_URL=https://your-api-domain`
+
+### Required backend env (production)
+- `APP_ENV=production`
+- `DATABASE_URL=postgresql://...`
+- `CORS_ORIGINS=https://your-frontend-domain`
+- `SETTINGS_API_KEY=...`
+- `UPLOAD_MAX_MB=50`
+- `SQL_ECHO=false`
+
+### Required frontend env
+- `VITE_API_URL=https://api.your-domain`
+
+### Hardening checklist
+- TLS termination at proxy/LB
+- Restrictive security groups
+- Persistent storage (EBS/S3) for `data/` and `artifacts/`
+- Lock down `/docs` and `/redoc` if public
+- Add rate limiting at proxy/CDN
+
+## Environment variables
+
+### Backend `.env.example`
+```env
+DATABASE_URL=postgresql://postgres:password@localhost:5432/pollution_db
+APP_ENV=development
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+UPLOAD_MAX_MB=50
+SQL_ECHO=false
+# SETTINGS_API_KEY=change_me
+```
+
+### Frontend `.env.example`
+```env
+VITE_API_URL=http://127.0.0.1:8000
+```
+
+## How HMM works in this project
+- Input CSV is cleaned and transformed into model features
+- Features are standardized using a persisted scaler
+- HMM is trained with configurable `n_states`
+- Hidden behavior is mapped to logical regimes (`stable`, `volatile`, `high`)
+- Confidence values and transitions are computed and stored
+- Analytics endpoints query stored predictions from canonical runs
 
 ## Folder structure
-See `docs/folder-structure.md`.
+```text
+Pollution_Regime_Classification/
+  backend/
+    backend/
+      routes/
+      services/
+      schemas/
+      main.py
+      database.py
+      models.py
+    alembic/
+    alembic.ini
+    requirements.txt
+    .env.example
+  frontend/
+    src/
+      api/
+      pages/
+      components/
+      context/
+    .env.example
+  docs/
+  README.md
+```
+
+## Operational notes
+- Trained artifacts are written to `artifacts/` at runtime.
+- Uploaded datasets are written to `data/`.
+- For production, use persistent storage or object storage (S3).
+- Training is synchronous; for scale, move training to a background job queue.
+
+## Troubleshooting
+- **CORS blocked**: set `CORS_ORIGINS` correctly and restart backend.
+- **DB auth failed**: verify `DATABASE_URL` credentials.
+- **Training timeout**: long runs are expected; frontend train timeout is extended, but async jobs are recommended for scale.
 
 ## Future improvements
-- Background training jobs + progress reporting
-- Auth + role-based settings access
-- Object storage for datasets/artifacts (S3)
-- CI + automated tests
+- Background training jobs + progress polling
+- Auth and role-based access control
+- CI/CD with automated tests and deployment checks
+- S3 integration for uploads/artifacts
+
+## Resume-ready highlights
+- Built a full-stack ML analytics platform (FastAPI + React) for pollution regime classification using HMM.
+- Implemented persistent run/prediction storage with PostgreSQL for reproducible analytics.
+- Enforced canonical latest successful run selection to eliminate dashboard data-source drift.
+- Added production hardening: settings validation, readiness checks, env-driven config, and write protection.
+
+## GitHub project description
+Pollution Regime Classification is a full-stack machine learning analytics app that detects latent pollution regimes from air-quality time series using Hidden Markov Models, with upload/train/inference workflows and interactive dashboard analytics.
+
+## Recommended GitHub topics
+`fastapi`, `react`, `tailwindcss`, `recharts`, `postgresql`, `sqlalchemy`, `pandas`, `numpy`, `hmmlearn`, `hidden-markov-model`, `time-series`, `analytics-dashboard`, `data-visualization`
 
 ## Author
 Arvind Kumar
-- Transition probability heatmap  
-- Regime mean & variance table  
-- Manual inference tool  
-
----
-
-## 🗂️ History & Logs
-Track previous model runs and performance.
-
-![History](https://github.com/user-attachments/assets/45ee7a2b-38bd-45e4-b9b4-b8b00d37e380)
-
-**Key Features**
-- Dataset history  
-- Log-likelihood scores  
-- Re-run and export options  
-
----
-
-## ⚙️ Tech Stack
-
-### Backend
-- Python  
-- FastAPI  
-- hmmlearn  
-- Pandas  
-- NumPy  
-
-### Frontend
-- React / Streamlit  
-
-### Database
-- MongoDB / PostgreSQL  
-
----
-
-## 🔄 ML Pipeline
-=======
->>>>>>> 78b8f6d (backup before sync)
-
-## 🏗️ System Architecture
-
-### Architecture Diagram 1
-![System Architecture 1](https://github.com/user-attachments/assets/60bcceb6-847f-401b-b77c-8b29ae547861)
-
-### Architecture Diagram 2
-![System Architecture 2](https://github.com/user-attachments/assets/f59d5180-cb59-4b9e-a057-a931002fba26)
-
-### Architecture Diagram 3
-![System Architecture 3](https://github.com/user-attachments/assets/62d9e740-08a7-4d22-a04a-54d8eadd2eac)
-
----
-
-# 🎨 AetherScan UI (Figma Wireframes)
-
-## 📊 Dashboard — “AirSense”
-Displays real-time pollution trends and regime insights.
-
-![Dashboard](https://github.com/user-attachments/assets/056a8055-bc8e-46ff-b11f-fa850a16a23b)
-
-**Key Features**
-- PM2.5 trend chart  
-- Current regime display  
-- AQI indicators  
-- Confidence score  
-- API connection status  
-
----
-
-## 📥 Model Input / Data Upload — “DataFlow”
-Interface for dataset upload and HMM configuration.
-
-![Model Input](https://github.com/user-attachments/assets/0c2ca3d6-e7d3-47d3-b901-4f91a98f3241)
-
-**Key Features**
-- CSV/JSON upload  
-- Hidden state slider (N)  
-- Covariance selection  
-- Train & classify trigger  
-
----
-
-## 📈 Prediction & Analytics — “Quantalytics”
-Deep model insights and regime statistics.
-
-![Analytics](https://github.com/user-attachments/assets/2dd82089-2797-41ce-ac69-c5618b1247d2)
-
-**Key Features**
-- Transition probability heatmap  
-- Regime mean & variance table  
-- Manual inference tool  
-
----
-
-## 🗂️ History & Logs
-Track previous model runs and performance.
-
-![History](https://github.com/user-attachments/assets/45ee7a2b-38bd-45e4-b9b4-b8b00d37e380)
-
-**Key Features**
-- Dataset history  
-- Log-likelihood scores  
-- Re-run and export options  
-
----
-
-## ⚙️ Tech Stack
-
-### Backend
-- Python  
-- FastAPI  
-- hmmlearn  
-- Pandas  
-- NumPy  
-
-### Frontend
-- React / Streamlit  
-
-### Database
-- MongoDB / PostgreSQL  
-
----
-
-## 🔄 ML Pipeline

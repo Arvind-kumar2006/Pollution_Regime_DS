@@ -1,0 +1,13 @@
+# Build from repo root with: Base directory = frontend
+# HTTPS site cannot call http:// EC2 from the browser; proxy /api to the backend.
+
+[[redirects]]
+  from = "/api/*"
+  to = "http://3.93.196.160:8000/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

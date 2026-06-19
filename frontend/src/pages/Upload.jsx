@@ -121,10 +121,18 @@ export default function Upload() {
             <h1 className="text-[34px] font-black text-slate-900 tracking-tight leading-none mb-3">
               Dataset Ingestion
             </h1>
-            <p className="text-[15px] text-slate-500 font-medium max-w-lg leading-relaxed">
+            <p className="text-[15px] text-slate-500 font-medium max-w-lg leading-relaxed mb-2">
               Upload time-series air quality data and configure regime classification parameters
               before running the HMM model.
             </p>
+            <a
+              href="/pollution.csv"
+              download="pollution.csv"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+            >
+              <File size={12} />
+              Download Template Dataset (pollution.csv)
+            </a>
           </div>
 
           <button

@@ -213,6 +213,34 @@ export default function Settings() {
               : ""}
           </p>
         )}
+
+        {/* Workflow instruction banner */}
+        <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mt-1">
+          <p className="text-[12px] font-black text-indigo-600 uppercase tracking-widest mb-3">How to apply changes</p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex items-start gap-3 flex-1 bg-white rounded-xl border border-indigo-100 px-4 py-3 shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-indigo-600 text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">1</div>
+              <div>
+                <p className="text-[13px] font-black text-slate-800">Customize Settings</p>
+                <p className="text-[12px] text-slate-500 font-medium mt-0.5">Adjust the parameters below to match your desired analysis behaviour (states, thresholds, dwell time etc.)</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 flex-1 bg-white rounded-xl border border-indigo-100 px-4 py-3 shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-indigo-600 text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">2</div>
+              <div>
+                <p className="text-[13px] font-black text-slate-800">Save Configuration</p>
+                <p className="text-[12px] text-slate-500 font-medium mt-0.5">Click <span className="font-black text-indigo-600">Save Configuration</span> below. Settings are persisted to the database immediately.</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 flex-1 bg-white rounded-xl border border-indigo-100 px-4 py-3 shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-indigo-600 text-white text-[11px] font-black flex items-center justify-center shrink-0 mt-0.5">3</div>
+              <div>
+                <p className="text-[13px] font-black text-slate-800">Re-upload &amp; Retrain</p>
+                <p className="text-[12px] text-slate-500 font-medium mt-0.5">Go to <span className="font-black text-indigo-600">Upload Data</span>, re-submit your dataset, then retrain the model to get your desired output.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-3xl p-10 shadow-sm max-w-3xl flex flex-col gap-8">

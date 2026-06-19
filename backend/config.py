@@ -21,3 +21,10 @@ def cors_origins_list():
     if s == "*":
         return ["*"]
     return [o.strip() for o in s.split(",") if o.strip()]
+
+
+# Storage Directories
+from pathlib import Path
+DATA_DIR = Path(os.environ.get("DATA_DIR", "data").strip())
+ARTIFACTS_DIR = Path(os.environ.get("ARTIFACTS_DIR", "artifacts").strip())
+

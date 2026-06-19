@@ -1,0 +1,16 @@
+{
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+      "dest": "http://3.93.196.160:8000/$1"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

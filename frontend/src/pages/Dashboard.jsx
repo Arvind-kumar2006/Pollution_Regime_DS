@@ -70,7 +70,6 @@ export default function Dashboard() {
             smoothedValue: sum / count
          };
       });
-
       // Generate Background Bands strictly for Recharts visual mapping
       const backgroundBands = [];
       if (computedChart.length > 0) {
@@ -284,9 +283,10 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div style={{ width: "100%", height: 350 }}>
+        {/* Main chart — NO Brush here */}
+        <div style={{ width: "100%", height: 360 }}>
           <ResponsiveContainer>
-            <LineChart data={chart} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+            <LineChart data={chart} margin={{ top: 20, right: 10, left: -20, bottom: 5 }}>
               <CartesianGrid stroke="#E2E8F0" strokeDasharray="6 6" vertical={false} />
               <XAxis 
                 dataKey="timeStr" 
@@ -294,7 +294,7 @@ export default function Dashboard() {
                 tick={{ fontSize: 11, fontWeight: 700 }} 
                 tickLine={false} 
                 axisLine={false} 
-                dy={15} 
+                dy={10} 
                 minTickGap={60}
                 interval="preserveStartEnd"
               />
@@ -310,53 +310,38 @@ export default function Dashboard() {
                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
                 labelStyle={{ fontWeight: "bold", color: "#64748B", marginBottom: "4px" }}
                 itemStyle={{ fontWeight: "900", color: "#1E293B" }}
-                formatter={(val, name, props) => {
+                formatter={(val, name) => {
                   if (name === "value") return [`${val.toFixed(1)} AQI`, "Value"];
                   if (name === "confidence") return [`${(val * 100).toFixed(1)}%`, "Confidence"];
                   return [val, name];
                 }}
               />
-              
-              {/* Dynamic Background Colored Areas */}
               {bands.map((b, i) => (
-                <ReferenceArea 
-                   key={i} 
-                   x1={b.start} 
-                   x2={b.end} 
-                   fill={REGIME_BG[b.regime]} 
-                   fillOpacity={1} 
-                />
+                <ReferenceArea key={i} x1={b.start} x2={b.end} fill={REGIME_BG[b.regime]} fillOpacity={1} />
               ))}
+              <Line name="Raw Value" type="monotone" dataKey="value" stroke="#94A3B8" strokeWidth={1.5} strokeOpacity={0.4} dot={false} activeDot={false} isAnimationActive={false} />
+              <Line name="Smoothed Trend" type="monotone" dataKey="smoothedValue" stroke="#1E293B" strokeWidth={2.5} dot={{ r: 1.5, stroke: "#1E293B", strokeWidth: 1, fill: "white" }} activeDot={{ r: 5, fill: "#000", stroke: "white", strokeWidth: 2 }} isAnimationActive={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
 
-              <Line
-                name="Raw Value"
-                type="monotone"
-                dataKey="value"
-                stroke="#94A3B8"
-                strokeWidth={1.5}
-                strokeOpacity={0.4}
-                dot={false}
-                activeDot={false}
-                isAnimationActive={false}
-              />
-              <Line
-                name="Smoothed Trend"
-                type="monotone"
-                dataKey="smoothedValue"
-                stroke="#1E293B"
-                strokeWidth={2.5}
-                dot={{ r: 1.5, stroke: "#1E293B", strokeWidth: 1, fill: "white" }}
-                activeDot={{ r: 5, fill: "#000", stroke: "white", strokeWidth: 2 }}
-                isAnimationActive={false}
-              />
-              <Brush 
-                dataKey="timeStr" 
-                height={24} 
-                stroke="#6366F1" 
+        {/* ── Real HTML gap between x-axis labels and the range slider ── */}
+        <div style={{ height: 20 }} />
+
+        {/* Standalone range slider — separate chart so gap is HTML-controlled */}
+        <div style={{ width: "100%", height: 48 }}>
+          <ResponsiveContainer>
+            <LineChart data={chart} margin={{ top: 0, right: 10, left: -20, bottom: 0 }}>
+              <XAxis dataKey="timeStr" hide />
+              <Brush
+                dataKey="timeStr"
+                height={44}
+                y={2}
+                stroke="#6366F1"
                 fill="#F8FAFC"
                 travellerWidth={12}
                 tickFormatter={() => ""}
-                startIndex={Math.max(0, chart.length - 24)} 
+                startIndex={Math.max(0, chart.length - 24)}
                 endIndex={chart.length - 1}
               />
             </LineChart>

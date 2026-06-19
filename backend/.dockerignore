@@ -1,0 +1,16 @@
+.git
+.gitignore
+
+# Python caches / virtualenvs
+**/__pycache__
+**/*.pyc
+.venv
+backend/.venv
+
+# Local runtime data
+artifacts
+data
+
+# OS/editor
+.DS_Store
+.cursor

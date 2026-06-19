@@ -8,9 +8,17 @@ artifacts/
 
 # Local uploads (public repo hygiene)
 data/*.csv
+pollution.csv
+
+# Local env files
+.env
+backend/.env
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
 
 # Frontend
 frontend/node_modules/
 frontend/dist/
-frontend/.env.local
+frontend/.vercel/
 

@@ -6,6 +6,12 @@ const API = axios.create({
   timeout: 15000,
 });
 
+/** Same value as backend SETTINGS_API_KEY when APP_ENV=production (Vite injects at build time). */
+function settingsWriteHeaders() {
+  const k = import.meta.env.VITE_SETTINGS_WRITE_KEY;
+  return k ? { "X-API-KEY": String(k) } : {};
+}
+
 const isDev = import.meta.env.DEV;
 
 API.interceptors.request.use((config) => {
@@ -65,11 +71,11 @@ export const getSettings = () => {
 };
 
 export const putSettings = (payload) => {
-  return API.put("/settings/", payload);
+  return API.put("/settings/", payload, { headers: settingsWriteHeaders() });
 };
 
 export const resetSettings = () => {
-  return API.post("/settings/reset");
+  return API.post("/settings/reset", null, { headers: settingsWriteHeaders() });
 };
 
 export const getModelInfo = () => {

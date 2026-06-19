@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi import HTTPException
+from fastapi import HTTPException # use to return error 
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.config import cors_origins_list
@@ -8,12 +8,10 @@ from backend.routes import data
 from backend.routes import model_routes
 from backend.routes import settings_routes
 
-# Schema: run `alembic upgrade head` (see alembic/versions). Do not use create_all in production.
-
 _origins = cors_origins_list()
 _use_wildcard = _origins == ["*"]
 
-app = FastAPI(title="Pollution API", docs_url="/docs", redoc_url="/redoc")
+app = FastAPI(title="Pollution API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_origins,
@@ -21,6 +19,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 app.include_router(data.router)
 app.include_router(model_routes.router)
 app.include_router(settings_routes.router)

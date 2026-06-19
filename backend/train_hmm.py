@@ -15,11 +15,8 @@ DEFAULT_FEATURES = [
     "T",
     "RH"
 ]
-
-
 def train_hmm(csv_path: Path, output_dir: Path, n_states: int = 3):
     output_dir.mkdir(parents=True, exist_ok=True)
-
     # ----------------------------
     # LOAD DATA
     # ----------------------------
